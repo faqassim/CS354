@@ -1,6 +1,6 @@
 LRU cache simulator which accounts for hits misses and evictions 
 
-//reference simulator is an executable provided by instructor
+//reference simulator is an executable provided by instructor for code testing purposes.
 
 SAMPLE OUTPUT: 
                       Your simulator     Reference simulator
