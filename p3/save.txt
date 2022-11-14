@@ -1,0 +1,220 @@
+void* balloc(int size) {     
+	//TODO: Your code goes in here.
+		int blockSize = 0;
+	int padSize = 0;
+	blockHeader *currentHeader = heap_start + 1;
+	blockHeader *best = currentHeader;
+	blockHeader *returnHeader = currentHeader;
+	blockHeader *split = NULL;
+
+	if (size < 0 || size > alloc_size) { 
+		return NULL;
+	} 
+
+	if (size % 8 > 0) { 
+		padSize = size % 8;
+		padSize = (8 - padSize) % 8;
+		blockSize = size + padSize;
+	} else { 
+		blockSize = size;
+	}
+
+
+	currentHeader += (currentHeader->size_status - (currentHeader->size_status % 8)) + 1;
+
+	while (currentHeader->size_status != 1) {
+		best = currentHeader;
+		if (currentHeader-> size_status < best->size_status && currentHeader->size_status > blockSize) {
+			best = currentHeader;
+			if(best->size_status == blockSize) {
+				returnHeader = best; 
+				break;
+				}
+			}			
+		}
+			if (currentHeader->size_status == blockSize) { 
+			currentHeader->size_status = blockSize + 1;
+			currentHeader = currentHeader + (currentHeader->size_status - (currentHeader->size_status % 8)); 
+			returnHeader = currentHeader;	
+			currentHeader += currentHeader->size_status - 3;
+		} else if (currentHeader->size_status > blockSize && (currentHeader->size_status - blockSize) % 8 == 0 ) { 
+		  		    *split = blockHeader* currentHeader->size_status - blockSize; 
+				 	currentHeader->size_status =  blockSize;  
+				 	returnHeader = currentHeader;  
+	}	else if (best == heap_start) {
+		return NULL; 
+	}
+
+	return returnHeader - (returnHeader->size_status % 8) - 4;
+} 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	blockHeader* currentHeader = heap_start;
+	blockHeader* best = NULL;
+	blockHeader* next = heap_start + 1;
+	int padSize = 0;
+	int blockSize = size +  4;
+	int currSize = 0;
+	int bestSize = 0;
+
+	if (size <= 0) return NULL;
+
+	if (blockSize % 8 > 0) { 
+		padSize = blockSize % 8;
+		padSize = (8 - padSize) % 8; 
+		blockSize = blockSize + padSize;
+	} 
+
+	bestSize = best->size_status - (best->size_status % 8);
+	while(currentHeader->size_status != 1) {
+		
+		if (blockSize == currSize) {
+			best = currentHeader;
+			best->size_status += 1;
+			next = (void*) best + getSize(best);
+			next->size_status += 2;
+		} else if (blockSize > currentHeader->size_status + getSize(currentHeader)) {
+			currentHeader += (void*) currentHeader + getSize(currentHeader);
+		} else {
+			split = (void*) currentHeader + blockSize;
+			split->size_status = getSize(currentHeader) - blockSize + 2;
+			blockHeader->size_status = blockSize + 1;
+			next = split;
+		}
+	
+	}
+
+	if(best == heap_start) {
+		return NULL;
+	}
+	if ((bestSize - blockSize) % 8 == 0) {
+			blockHeader* split = (blockHeader*)(void*)currentHeader + (currentHeader->size_status / 4);
+			split->size_status -= blockSize;
+			best->size_status = blockSize;
+		}
+	best->size_status += 1;
+	next = (blockHeader*) ((void*)currentHeader + (currentHeader->size_status - (currentHeader->size_status % 8));
+	next->size_status += 2;
+
+		return best + 1;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+blockHeader* currentHeader = heap_start;
+	blockHeader* next = (void*) currentHeader + getSize(currentHeader);
+	blockHeader* best = NULL;
+	blockHeader* split = NULL;
+	int blockSize = size + 4;
+	int padSize = 0;
+
+	if (size <= 0) return NULL;
+
+	if (blockSize % 8 > 0) { 
+		padSize = blockSize % 8;
+		padSize = (8 - padSize) % 8; 
+		blockSize = blockSize + padSize;
+	}
+	while (currentHeader->size_status != 1) {
+		if(next->size_status != 1) {
+		next = (blockHeader*)(void*) currentHeader + getSize(currentHeader);
+		}
+		//printf("%d", next->size_status);
+		if (isFree(currentHeader)) {
+		//printf("%d", isFree(currentHeader));
+			if (blockSize == getSize(currentHeader)) {
+				best = currentHeader;
+				break; 			
+			}  else if (getSize(currentHeader) > blockSize) {
+				if (best == NULL) {
+					best = currentHeader;
+				} else if (getSize(best) > getSize(currentHeader)) {
+					best = currentHeader;	
+				}
+
+			}
+		} 
+		 currentHeader = next;
+	}
+	if (best == NULL) return NULL;
+	best->size_status += 1;
+	int apbitsbest = best->size_status % 8;
+		if (((getSize(best) - blockSize) % 8 == 0) && (getSize(best) - blockSize != 0)) {
+			split = (blockHeader*)(void*) best + blockSize;
+			split->size_status = (getSize(best) - blockSize);
+			best->size_status = blockSize + apbitsbest;
+			next = split;
+			next->size_status += 2;
+		}
+
+		else if (next->size_status != 1){	
+			next = (void*) best + getSize(best);
+			next->size_status += 2;
+		}
+	return best + 1;
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+	//TODO: Your code goes in here. 
+	 int blockSize = size + 4;
+	 int currSize = 0;
+	 int bestSize = 0;
+	 int perfectFit = 0;
+	 blockHeader* currentHeader = heap_start;
+	 blockHeader* best = currentHeader;
+	 blockHeader* next = (blockHeader*) ((void*) currentHeader + getSize(currentHeader));
+	 blockHeader* split = NULL;
+	 blockHeader* footer = NULL;
+
+	 if (size <= 0) return NULL;
+
+	 if (blockSize % 8 != 0) blockSize = blockSize + (8 - (blockSize % 8));
+
+	 while (currentHeader->size_status != 1) {
+	 	currSize = getSize(currentHeader);
+
+	 	if (isFree(currentHeader)) {
+	 		if (blockSize == currSize) {
+	 			best = currentHeader;
+	 			perfectFit++;
+	 			break;
+	 		} else if(currSize > blockSize) {
+	 		if (best == NULL) {
+	 			best = currentHeader;
+	 		} else if (best->size_status > currentHeader->size_status) {
+	 			best = currentHeader;
+	 		}
+	 	}
+	 }
+	 currentHeader = (blockHeader*) ((void*) currentHeader + currSize);
+	 }
+	 if (best == NULL) return NULL;
+
+	 bestSize = getSize(best);
+	 next = (blockHeader*) ((void*) best + bestSize);
+
+	 if (perfectFit) {
+	 	if (next->size_status == 1) {
+	 		best->size_status += 1;
+	 		return ((void*) best + sizeof(blockHeader));
+	 	} else {
+	 		 	next->size_status += 2;
+	 		 	best->size_status += 1;
+	 		 	return ((void*) best + sizeof(blockHeader));
+	 	}
+	 } else {
+	 	if ((bestSize - blockSize) % 8 == 0) {
+	 		split = (blockHeader*) ((void*) best + blockSize);
+	 		split->size_status = (bestSize - blockSize) + 2;
+	 		footer = (blockHeader*) ((void*) split + (bestSize - blockSize) - sizeof(blockHeader));
+	 		footer->size_status = bestSize - blockSize;
+
+	 		if (best->size_status % 8 == 2) {
+	 			best->size_status = blockSize + 3;
+	 		} else {
+	 			best->size_status = blockSize + 1;
+	 		}
+	 	}
+
+	 	else best->size_status += 1;
+	 	return ((void*) best + sizeof(blockHeader)); 
+	 }
+	 return NULL;
+ }
