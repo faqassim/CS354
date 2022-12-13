@@ -12,4 +12,6 @@ p3  - heap implementation
 
 p4B - LRU Cach
 
+p6 - Signal handling and processing
+
 THANK YOU FOR TAKING THE TIME TO LOOK AT THIS REPOSITORY! :D 
