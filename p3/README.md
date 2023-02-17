@@ -4,4 +4,5 @@ Free blocks have an additional footer that only contains its size to showcase th
 
 Illustration: 
 
-![My Image](illustration.png)
+
+![image](https://user-images.githubusercontent.com/109580376/219672982-08ae328b-bf0d-4d3c-a82d-a3e5ee7616f8.png)
